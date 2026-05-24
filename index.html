@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>位置追踪器</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <div class="auth-screen" id="authScreen">
+      <div class="auth-container glass-panel">
+        <div class="auth-logo">🧭</div>
+        <h2 class="auth-title">位置追踪器</h2>
+        <p class="auth-subtitle">与朋友实时共享位置</p>
+        
+        <div class="auth-tabs">
+          <button class="auth-tab active" data-tab="login">登录</button>
+          <button class="auth-tab" data-tab="register">注册</button>
+        </div>
+
+        <form class="auth-form" id="loginForm">
+          <div class="input-group">
+            <input type="text" id="loginUsername" placeholder="用户名" required>
+          </div>
+          <div class="input-group">
+            <input type="password" id="loginPassword" placeholder="密码" required>
+          </div>
+          <button type="submit" class="auth-submit">登录</button>
+        </form>
+
+        <form class="auth-form hidden" id="registerForm">
+          <div class="input-group">
+            <input type="text" id="registerUsername" placeholder="用户名（3-20字符）" required minlength="3" maxlength="20">
+          </div>
+          <div class="input-group">
+            <input type="password" id="registerPassword" placeholder="密码（6位以上）" required minlength="6">
+          </div>
+          <div class="input-group">
+            <input type="password" id="registerConfirm" placeholder="确认密码" required>
+          </div>
+          <button type="submit" class="auth-submit">注册</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="main-screen hidden" id="mainScreen">
+      <header class="header">
+        <div class="header-content">
+          <h1>🧭 位置追踪</h1>
+          <div class="header-actions">
+            <button class="icon-btn" id="addFriendBtn" title="添加好友">
+              <span>👥</span>
+            </button>
+            <button class="icon-btn" id="logoutBtn" title="退出登录">
+              <span>🚪</span>
+            </button>
+          </div>
+        </div>
+        <div class="user-info">
+          <span class="user-avatar" id="userAvatar">👤</span>
+          <span class="user-name" id="userName">用户名</span>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="compass-container">
+          <div class="compass-ring" id="compassRing">
+            <div class="direction-marker north">N</div>
+            <div class="direction-marker east">E</div>
+            <div class="direction-marker south">S</div>
+            <div class="direction-marker west">W</div>
+            <div class="compass-arrow" id="compassArrow">
+              <div class="arrow-head"></div>
+              <div class="arrow-body"></div>
+            </div>
+            <div class="compass-center">
+              <span class="distance-value" id="distanceValue">--</span>
+              <span class="distance-unit" id="distanceUnit">米</span>
+            </div>
+          </div>
+          <div class="bearing-display">
+            <span class="bearing-value" id="bearingValue">--°</span>
+            <span class="bearing-label" id="bearingLabel">选择追踪目标</span>
+          </div>
+        </div>
+
+        <div class="tracking-status glass-panel" id="trackingStatus">
+          <div class="tracking-avatar" id="trackingAvatar">🎯</div>
+          <div class="tracking-info">
+            <span class="tracking-name" id="trackingName">未选择追踪目标</span>
+            <span class="tracking-time" id="trackingTime">--</span>
+          </div>
+          <button class="tracking-cancel hidden" id="trackingCancel">取消追踪</button>
+        </div>
+
+        <div class="friend-section">
+          <div class="section-header">
+            <h3>� 好友列表</h3>
+            <span class="friend-count" id="friendCount">0</span>
+          </div>
+          <div class="friend-list" id="friendList">
+            <div class="empty-state">
+              <p>暂无好友</p>
+              <p class="hint">点击右上角添加好友</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mode-toggle">
+          <button class="mode-btn active" id="modeFollow">
+            <span>跟随模式</span>
+          </button>
+          <button class="mode-btn" id="modeFixed">
+            <span>锁定北向</span>
+          </button>
+        </div>
+      </main>
+    </div>
+
+    <div class="modal glass-panel" id="friendModal">
+      <div class="modal-content">
+        <h3>添加好友</h3>
+        <div class="input-group">
+          <label for="friendUsername">好友用户名</label>
+          <input type="text" id="friendUsername" placeholder="输入好友的用户名">
+        </div>
+        <div class="modal-actions">
+          <button class="modal-btn cancel" id="friendModalCancel">取消</button>
+          <button class="modal-btn confirm" id="friendModalConfirm">添加</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal glass-panel" id="shareModal">
+      <div class="modal-content">
+        <h3>分享给好友</h3>
+        <p class="share-desc">复制你的用户名，让朋友添加你：</p>
+        <div class="share-username-container">
+          <input type="text" id="myUsername" readonly class="share-username-input">
+          <button class="copy-btn" id="copyUsername">复制</button>
+        </div>
+        <div class="modal-actions">
+          <button class="modal-btn confirm" id="closeShareModal">关闭</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal glass-panel" id="confirmModal">
+      <div class="modal-content">
+        <h3 id="confirmTitle">确认</h3>
+        <p class="confirm-message" id="confirmMessage"></p>
+        <div class="modal-actions">
+          <button class="modal-btn cancel" id="confirmCancel">取消</button>
+          <button class="modal-btn confirm" id="confirmOk">确认</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">
+      <span id="toastMessage"></span>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
